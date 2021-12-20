@@ -6,9 +6,11 @@ function main() {
     const P = new Point(-2, -2);
 
     let newPoint = pointAddition(P, P, a, b);
+    console.log('2P: ', newPoint);
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 3; i < 100; i++) {
         newPoint = pointAddition(newPoint, P, a, b);
+        console.log(`${i}P: `, newPoint);
     }
 }
 
@@ -31,8 +33,5 @@ function pointAddition(P = new Point(), Q = new Point(), a, b) {
     const y3 = (beta * (x1 - x3)) - y1;
 
     const R = new Point(x3, y3);
-
-    console.log(R);
-
     return R;
 }
