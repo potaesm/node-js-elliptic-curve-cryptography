@@ -5,7 +5,7 @@ function main() {
     const b = 4;
     const P = new Point(-2, -2);
 
-    let newPoint = new Point();
+    let newPoint = pointAddition(P, P, a, b);
 
     for (let i = 0; i < 100; i++) {
         newPoint = pointAddition(newPoint, P, a, b);
