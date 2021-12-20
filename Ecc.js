@@ -5,18 +5,42 @@ function main() {
     const b = 4;
     const P = new Point(-2, -2);
 
-    let newPoint = pointAddition(P, P, a, b);
-    console.log('2P: ', newPoint);
-
-    for (let i = 3; i < 100; i++) {
-        newPoint = pointAddition(newPoint, P, a, b);
-        console.log(`${i}P: `, newPoint);
+    /** Brute force */
+    let newPoint = applyPointAddition(P, P, a, b);
+    // console.log('2P: ', newPoint);
+    for (let i = 3; i <= 100; i++) {
+        newPoint = applyPointAddition(newPoint, P, a, b);
+        // console.log(`${i}P: `, newPoint);
     }
+    console.log('Brute force', newPoint);
+
+    /** Double and add */
+    const doubleAndAddPoint = applyDoubleAndAddMethod(P, 100, a, b);
+    console.log('Double and add', doubleAndAddPoint);
 }
 
 main();
 
-function pointAddition(P = new Point(), Q = new Point(), a, b) {
+function dec2bin(dec) {
+    return (dec >>> 0).toString(2);
+}
+
+function applyDoubleAndAddMethod(P = new Point(), k = 0, a = 0, b = 0) {
+    const kAsBinary = dec2bin(k);
+    // console.log(`(${k})10 = (${kAsBinary})2`);
+    let outputPoint = new Point(P.getPointX(), P.getPointY());
+    for (let i = 1; i < kAsBinary.length; i++) {
+        const currentBit = Number(kAsBinary[i]);
+        // console.log(currentBit);
+        outputPoint = applyPointAddition(outputPoint, outputPoint, a, b);
+        if (currentBit === 1) {
+            outputPoint = applyPointAddition(outputPoint, P, a, b);
+        }
+    }
+    return outputPoint;
+}
+
+function applyPointAddition(P = new Point(), Q = new Point(), a = 0, b = 0) {
     const x1 = P.getPointX();
     const y1 = P.getPointY();
     const x2 = Q.getPointX();
