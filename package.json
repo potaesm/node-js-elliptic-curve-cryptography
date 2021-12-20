@@ -1,0 +1,25 @@
+{
+  "name": "node-js-elliptic-curve-cryptography",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon Ecc.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/potaesm/node-js-elliptic-curve-cryptography.git"
+  },
+  "keywords": [
+    "node-js-elliptic-curve-cryptography"
+  ],
+  "author": "Suthinan Musitmani",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/potaesm/node-js-elliptic-curve-cryptography/issues"
+  },
+  "homepage": "https://github.com/potaesm/node-js-elliptic-curve-cryptography#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
