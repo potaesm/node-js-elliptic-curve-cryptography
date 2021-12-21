@@ -23,7 +23,7 @@ function main() {
     const ka = new BigDecimal('10000021');
     /** Private key of Bob */
     const kb = new BigDecimal('10000077');
-    /** Key exchange */
+    /** Key exchange - Elliptic Curve Diffie Hellman */
     const alicePublicKey = applyDoubleAndAddMethod(P, ka, a, b);
     const bobPublicKey = applyDoubleAndAddMethod(P, kb, a, b);
     console.log({
