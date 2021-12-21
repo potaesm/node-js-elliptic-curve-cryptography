@@ -2,8 +2,8 @@ const BigDecimal = require('js-big-decimal');
 const Point = require('./Point');
 
 function main() {
-    const a = -4;
-    const b = 4;
+    const a = new BigDecimal(-4);
+    const b = new BigDecimal(4);
     const P = new Point(new BigDecimal(-2), new BigDecimal(-2));
 
     // /** Brute force */
@@ -20,16 +20,24 @@ function main() {
     // console.log('Double and add\n', doubleAndAddPoint.getPoint());
 
     /** Private key of Alice */
-    const ka = 21;
+    const ka = new BigDecimal('10000021');
     /** Private key of Bob */
-    const kb = 77;
+    const kb = new BigDecimal('10000077');
     /** Key exchange */
     const alicePublicKey = applyDoubleAndAddMethod(P, ka, a, b);
     const bobPublicKey = applyDoubleAndAddMethod(P, kb, a, b);
-    console.log({ alicePrivateKey: ka, alicePublicKey: alicePublicKey.getPoint(), bobPrivateKey: kb, bobPublicKey: bobPublicKey.getPoint() });
+    console.log({
+        alicePrivateKey: ka.getValue(),
+        alicePublicKey: alicePublicKey.getPoint(),
+        bobPrivateKey: kb.getValue(),
+        bobPublicKey: bobPublicKey.getPoint()
+    });
     const aliceSharedKey = applyDoubleAndAddMethod(bobPublicKey, ka, a, b);
     const bobSharedKey = applyDoubleAndAddMethod(alicePublicKey, kb, a, b);
-    console.log({ aliceSharedKey: aliceSharedKey.getPoint(12), bobSharedKey: bobSharedKey.getPoint(12) });
+    console.log({
+        aliceSharedKey: aliceSharedKey.getPoint(50),
+        bobSharedKey: bobSharedKey.getPoint(50)
+    });
 }
 
 main();
@@ -38,9 +46,9 @@ function dec2bin(dec) {
     return (dec >>> 0).toString(2);
 }
 
-function applyDoubleAndAddMethod(P = new Point(), k = 0, a = 0, b = 0, precision = 20) {
-    const kAsBinary = dec2bin(k);
-    // console.log(`(${k})10 = (${kAsBinary})2`);
+function applyDoubleAndAddMethod(P = new Point(), k = new BigDecimal(0), a = new BigDecimal(0), b = new BigDecimal(0), precision = 100) {
+    const kAsBinary = dec2bin(k.getValue());
+    // console.log(`(${k.getValue()})10 = (${kAsBinary})2`);
     let outputPoint = new Point(P.getPointX(), P.getPointY());
     for (let i = 1; i < kAsBinary.length; i++) {
         const currentBit = Number(kAsBinary[i]);
@@ -53,7 +61,7 @@ function applyDoubleAndAddMethod(P = new Point(), k = 0, a = 0, b = 0, precision
     return outputPoint;
 }
 
-function applyPointAddition(P = new Point(), Q = new Point(), a = 0, b = 0, precision = 20) {
+function applyPointAddition(P = new Point(), Q = new Point(), a = new BigDecimal(0), b = new BigDecimal(0), precision = 100) {
     const x1 = P.getPointX();
     const y1 = P.getPointY();
     const x2 = Q.getPointX();
@@ -61,7 +69,7 @@ function applyPointAddition(P = new Point(), Q = new Point(), a = 0, b = 0, prec
     let beta;
     if (x1.compareTo(x2) === 0 && y1.compareTo(y2) === 0) {
         /** Apply doubling */
-        beta = ((new BigDecimal(3).multiply(x1).multiply(x1)).add(new BigDecimal(a))).divide(new BigDecimal(2).multiply(y1), precision);
+        beta = ((new BigDecimal(3).multiply(x1).multiply(x1)).add(a)).divide(new BigDecimal(2).multiply(y1), precision);
         // beta = ((3 * x1 * x1) + a) / (2 * y1);
     } else {
         /** Apply point addition */
