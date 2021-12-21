@@ -1,4 +1,3 @@
-const bigIntModArith = require('bigint-mod-arith');
 const Point = require('./Point');
 
 const globalMod = generatePrimeModulo();
@@ -65,7 +64,7 @@ function generatePrimeModulo() {
 // function findMultiplicativeInverse(bigInt = BigInt(0), mod = globalMod) {
 //     /** Find Multiplicative Inverse [a^-1 mod p] = c */
 //     // b / a = b * [(a^-1) mod p] = b * c
-//     return bigIntModArith.modInv(bigInt, BigInt(mod));
+//     return require('bigint-mod-arith').modInv(bigInt, BigInt(mod));
 // }
 
 function findMultiplicativeInverse(a = BigInt(0)) {
