@@ -62,10 +62,41 @@ function generatePrimeModulo() {
     return (2n ** 256n) - (2n ** 32n) - (2n ** 9n) - (2n ** 8n) - (2n ** 7n) - (2n ** 6n) - (2n ** 4n) - 1n;
 }
 
-function findMultiplicativeInverse(bigInt = BigInt(0), mod = globalMod) {
-    /** Extended Euclidean Algorithm */
-    // b / a = b * (a^-1) mod p = b * c
-    return bigIntModArith.modInv(bigInt, BigInt(mod));
+// function findMultiplicativeInverse(bigInt = BigInt(0), mod = globalMod) {
+//     /** Find Multiplicative Inverse [a^-1 mod p] = c */
+//     // b / a = b * [(a^-1) mod p] = b * c
+//     return bigIntModArith.modInv(bigInt, BigInt(mod));
+// }
+
+function findMultiplicativeInverse(a = BigInt(0)) {
+    /** Extended Euclidean Algorithm To Find Multiplicative Inverse [a^-1 mod p] = c */
+    // b / a = b * [(a^-1) mod p] = b * c
+    while (a < 0n) {
+        a = a + globalMod;
+    }
+    let x1 = BigInt(1);
+    let x2 = BigInt(0);
+    let x3 = globalMod;
+    let y1 = BigInt(0);
+    let y2 = BigInt(1);
+    let y3 = a;
+    let q = x3 / y3;
+    let t1 = x1 - (q * y1);
+    let t2 = x2 - (q * y2);
+    let t3 = x3 - (q * y3);
+    while (y3 != 1n) {
+        x1 = y1;
+        x2 = y2;
+        x3 = y3;
+        y1 = t1;
+        y2 = t2;
+        y3 = t3;
+        q = x3 / y3;
+        t1 = x1 - (q * y1);
+        t2 = x2 - (q * y2);
+        t3 = x3 - (q * y3);
+    }
+    return y2;
 }
 
 function applyDoubleAndAddMethod(P = new Point(), k = BigInt(0), a = BigInt(0), b = BigInt(0), mod = globalMod) {
