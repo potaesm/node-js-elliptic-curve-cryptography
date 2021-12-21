@@ -21,5 +21,8 @@
   "homepage": "https://github.com/potaesm/node-js-elliptic-curve-cryptography#readme",
   "devDependencies": {
     "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "js-big-decimal": "^1.3.4"
   }
 }

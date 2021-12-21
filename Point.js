@@ -1,5 +1,7 @@
+const BigDecimal = require('js-big-decimal');
+
 class Point {
-    constructor(pointX = 0, pointY = 0) {
+    constructor(pointX = new BigDecimal(0), pointY = new BigDecimal(0)) {
         this.pointX = pointX;
         this.pointY = pointY;
     }
@@ -9,11 +11,14 @@ class Point {
     getPointY() {
         return this.pointY;
     }
-    setPointX(pointX) {
+    setPointX(pointX = new BigDecimal(0)) {
         this.pointX = pointX;
     }
-    setPointY(pointY) {
+    setPointY(pointY = new BigDecimal(0)) {
         this.pointY = pointY;
+    }
+    getPoint(precision = 20) {
+        return `(${this.pointX.round(precision, 5).getValue()}, ${this.pointY.round(precision, 5).getValue()})`;
     }
 }
 
