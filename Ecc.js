@@ -6,7 +6,7 @@ const globalModulo = bitcoinConfig.modulo;
 /** Curve Equation y^2 = x^3 + ax + b */
 const { a, b } = bitcoinConfig;
 /** Base Point On The Curve */
-const P = bitcoinConfig.basePoint;
+const P = new Point(bitcoinConfig.basePointX, bitcoinConfig.basePointY);
 /** Point Of The Finite Field - Order Of Group */
 const order = bitcoinConfig.order;
 

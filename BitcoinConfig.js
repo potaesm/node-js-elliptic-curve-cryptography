@@ -1,5 +1,3 @@
-const Point = require("./Point");
-
 /** Curve y^2 = x^3 + ax + b = x^3 + 7 */
 const a = BigInt(0);
 const b = BigInt(7);
@@ -14,9 +12,8 @@ const modulo = generatePrimeModulo();
 const order = BigInt('0x' + 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
 
 /** Base Point */
-const basePoint = new Point();
-basePoint.setPointX(BigInt('55066263022277343669578718895168534326250603453777594175500187360389116729240'));
-basePoint.setPointY(BigInt('32670510020758816978083085130507043184471273380659243275938904335757337482424'));
+const basePointX = BigInt('55066263022277343669578718895168534326250603453777594175500187360389116729240');
+const basePointY = BigInt('32670510020758816978083085130507043184471273380659243275938904335757337482424');
 
 /** Sample Private Key */
 const privateKey = BigInt('75263518707598184987916378021939673586055614731957507592904438851787542395619');
@@ -28,7 +25,8 @@ module.exports = {
     b,
     modulo,
     order,
-    basePoint,
+    basePointX,
+    basePointY,
     privateKey,
     randomKey
 };
