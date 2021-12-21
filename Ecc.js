@@ -1,73 +1,114 @@
+const bitcoinConfig = require('./BitcoinConfig');
 const Point = require('./Point');
 
-const globalModulo = generatePrimeModulo();
+/** Modulo p */
+const globalModulo = bitcoinConfig.modulo;
+/** Curve Equation y^2 = x^3 + ax + b */
+const { a, b } = bitcoinConfig;
+/** Base Point On The Curve */
+const P = bitcoinConfig.basePoint;
+/** Point Of The Finite Field - Order Of Group */
+const order = bitcoinConfig.order;
 
 function main() {
-    const a = BigInt(1);
-    const b = BigInt(1);
-    const P = new Point(BigInt(3), BigInt(10));
-
-    // // console.log('P: ', P);
-    // /** Brute force */
+    /*********************************************************************************************** */
+    // console.log('P: ', P);
+    // /** Brute Force */
     // let newPoint = applyPointAddition(P, P, a, b);
-    // // console.log('2P: ', newPoint);
+    // console.log('2P: ', newPoint);
     // for (let i = 3; i <= 100; i++) {
     //     try {
     //         newPoint = applyPointAddition(newPoint, P, a, b);
-    //         // console.log(`${i}P: `, newPoint);
+    //         console.log(`${i}P: `, newPoint);
     //     } catch (error) {
     //         break;
     //     }
     // }
     // console.log('Brute force\n', newPoint.getPoint());
 
-    // /** Double and add */
+    // /** Double And Add */
     // const doubleAndAddPoint = applyDoubleAndAddMethod(P, 100, a, b);
     // console.log('Double and add\n', doubleAndAddPoint.getPoint());
 
-    /** Private key of Alice */
-    const ka = BigInt('100000000021');
-    /** Private key of Bob */
-    const kb = BigInt('100000000077');
-    /** Key exchange - Elliptic Curve Diffie Hellman */
-    let timeStart, timeStop;
-    timeStart = new Date();
-    const alicePublicKey = applyDoubleAndAddMethod(P, ka, a, b);
-    timeStop = new Date();
-    console.log(`Public key generation time: `, timeStop.valueOf() - timeStart.valueOf(), 'ms');
-    const bobPublicKey = applyDoubleAndAddMethod(P, kb, a, b);
-    console.log({
-        alicePrivateKey: ka,
-        alicePublicKey: alicePublicKey.getPoint(),
-        bobPrivateKey: kb,
-        bobPublicKey: bobPublicKey.getPoint()
-    });
-    timeStart = new Date();
-    const aliceSharedKey = applyDoubleAndAddMethod(bobPublicKey, ka, a, b);
-    timeStop = new Date();
-    console.log(`Shared key generation time: `, timeStop.valueOf() - timeStart.valueOf(), 'ms');
-    const bobSharedKey = applyDoubleAndAddMethod(alicePublicKey, kb, a, b);
-    console.log({
-        aliceSharedKey: aliceSharedKey.getPoint(),
-        bobSharedKey: bobSharedKey.getPoint()
-    });
+    /*********************************************************************************************** */
+    // /** Key exchange - Elliptic Curve Diffie Hellman */
+    // /** Private key of Alice */
+    // const ka = BigInt('100000000021');
+    // /** Private key of Bob */
+    // const kb = BigInt('100000000077');
+    // let timeStart, timeStop;
+    // timeStart = new Date();
+    // const alicePublicKey = applyDoubleAndAddMethod(P, ka, a, b);
+    // timeStop = new Date();
+    // console.log(`Public key generation time: `, timeStop.valueOf() - timeStart.valueOf(), 'ms');
+    // const bobPublicKey = applyDoubleAndAddMethod(P, kb, a, b);
+    // console.log({
+    //     alicePrivateKey: ka,
+    //     alicePublicKey: alicePublicKey.getPoint(),
+    //     bobPrivateKey: kb,
+    //     bobPublicKey: bobPublicKey.getPoint()
+    // });
+    // timeStart = new Date();
+    // const aliceSharedKey = applyDoubleAndAddMethod(bobPublicKey, ka, a, b);
+    // timeStop = new Date();
+    // console.log(`Shared key generation time: `, timeStop.valueOf() - timeStart.valueOf(), 'ms');
+    // const bobSharedKey = applyDoubleAndAddMethod(alicePublicKey, kb, a, b);
+    // console.log({
+    //     aliceSharedKey: aliceSharedKey.getPoint(),
+    //     bobSharedKey: bobSharedKey.getPoint()
+    // });
+
+    /*********************************************************************************************** */
+    /** Elliptic Curve Digital Signature Algorithm (ECDSA) */
+    /** Hashing */
+    const text = 'Created by Suthinan Musitmani';
+    const hash = cryptoHash(text);
+    console.log(text, hash);
+    /** Private Key And Public Key */
+    const privateKey = bitcoinConfig.privateKey;
+    const publicKey = applyDoubleAndAddMethod(P, privateKey, a, b);
+    console.log({ privateKey, publicKey: publicKey.getPoint() });
+    /** Random Key And Random Point */
+    const randomKey = bitcoinConfig.randomKey;
+    const randomPoint = applyDoubleAndAddMethod(P, randomKey, a, b);
+    console.log({ randomKey, randomPoint: randomPoint.getPoint() });
+    /** Signature */
+    const r = randomPoint.getPointX() % order;
+    const s = ((hash + (r * privateKey)) * multiplicativeInverse(randomKey, order)) % order;
+    console.log({ r, s });
+    /** Verification */
+    const w = multiplicativeInverse(s, order);
+    const u1 = applyDoubleAndAddMethod(P, ((hash * w) % order), a, b, globalModulo);
+    const u2 = applyDoubleAndAddMethod(publicKey, ((r * w) % order), a, b, globalModulo);
+    const checkPoint = applyPointAddition(u1, u2, a, b, globalModulo);
+    console.log({ checkPoint: checkPoint.getPoint() });
+    if (checkPoint.getPointX() == r) {
+        console.info('Signature is valid', checkPoint.getPointX(), r);
+    } else {
+        console.warn('Signature is invalid', checkPoint.getPointX(), r);
+    }
 }
 
 main();
 
-function generatePrimeModulo() {
-    // secp256k1
-    // 2^256 - 2^32 - 2^9 - 2^8 - 2^7 - 2^6 - 1
-    return (2n ** 256n) - (2n ** 32n) - (2n ** 9n) - (2n ** 8n) - (2n ** 7n) - (2n ** 6n) - (2n ** 4n) - 1n;
+function cryptoHash(...inputs) {
+    const hash = require('crypto').createHash('sha256');
+    hash.update(inputs.map(input => (typeof input === 'string') ? input : JSON.stringify(input)).sort().join(' '));
+    return hex2bigInt(hash.digest('hex'));
+};
+
+function hex2bigInt(hex) {
+    if (hex.length % 2) { hex = '0' + hex }
+    return BigInt('0x' + hex);
 }
 
-// function findMultiplicativeInverse(a = BigInt(0), modulo = globalModulo) {
+// function multiplicativeInverse(a = BigInt(0), modulo = globalModulo) {
 //     /** Find Multiplicative Inverse [a^-1 modulo p] = c */
 //     // b / a = b * [(a^-1) modulo p] = b * c
 //     return require('bigint-mod-arith').modInv(a, BigInt(modulo));
 // }
 
-function findMultiplicativeInverse(a = BigInt(0), modulo = globalModulo) {
+function multiplicativeInverse(a = BigInt(0), modulo = globalModulo) {
     /** Extended Euclidean Algorithm To Find Multiplicative Inverse [a^-1 modulo p] = c */
     // b / a = b * [(a^-1) modulo p] = b * c
     while (a < 0n) {
@@ -95,6 +136,9 @@ function findMultiplicativeInverse(a = BigInt(0), modulo = globalModulo) {
         t2 = x2 - (q * y2);
         t3 = x3 - (q * y3);
     }
+    while (y2 < 0) {
+        y2 = y2 + modulo;
+    }
     return y2;
 }
 
@@ -121,16 +165,16 @@ function applyPointAddition(P = new Point(), Q = new Point(), a = BigInt(0), b =
     let beta;
     if (x1 == x2 && y1 == y2) {
         /** Apply doubling */
-        beta = ((3n * x1 * x1) + a) * findMultiplicativeInverse(2n * y1);
+        beta = ((3n * x1 * x1) + a) * multiplicativeInverse(2n * y1);
     } else {
         /** Apply point addition */
-        beta = (y2 - y1) * findMultiplicativeInverse(x2 - x1);
+        beta = (y2 - y1) * multiplicativeInverse(x2 - x1);
     }
     let x3 = (beta * beta) - x1 - x2;
     let y3 = (beta * (x1 - x3)) - y1;
 
     const abs = (x) => {
-        return x < 0n ? -x : x
+        return x < 0n ? -x : x;
     };
 
     while (x3 < 0n) {
