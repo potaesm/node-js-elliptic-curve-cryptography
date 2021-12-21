@@ -1,6 +1,6 @@
 const Point = require('./Point');
 
-const globalMod = generatePrimeModulo();
+const globalModulo = generatePrimeModulo();
 
 function main() {
     const a = BigInt(1);
@@ -61,21 +61,21 @@ function generatePrimeModulo() {
     return (2n ** 256n) - (2n ** 32n) - (2n ** 9n) - (2n ** 8n) - (2n ** 7n) - (2n ** 6n) - (2n ** 4n) - 1n;
 }
 
-// function findMultiplicativeInverse(bigInt = BigInt(0), mod = globalMod) {
-//     /** Find Multiplicative Inverse [a^-1 mod p] = c */
-//     // b / a = b * [(a^-1) mod p] = b * c
-//     return require('bigint-mod-arith').modInv(bigInt, BigInt(mod));
+// function findMultiplicativeInverse(a = BigInt(0), modulo = globalModulo) {
+//     /** Find Multiplicative Inverse [a^-1 modulo p] = c */
+//     // b / a = b * [(a^-1) modulo p] = b * c
+//     return require('bigint-mod-arith').modInv(a, BigInt(modulo));
 // }
 
-function findMultiplicativeInverse(a = BigInt(0)) {
-    /** Extended Euclidean Algorithm To Find Multiplicative Inverse [a^-1 mod p] = c */
-    // b / a = b * [(a^-1) mod p] = b * c
+function findMultiplicativeInverse(a = BigInt(0), modulo = globalModulo) {
+    /** Extended Euclidean Algorithm To Find Multiplicative Inverse [a^-1 modulo p] = c */
+    // b / a = b * [(a^-1) modulo p] = b * c
     while (a < 0n) {
-        a = a + globalMod;
+        a = a + modulo;
     }
     let x1 = BigInt(1);
     let x2 = BigInt(0);
-    let x3 = globalMod;
+    let x3 = modulo;
     let y1 = BigInt(0);
     let y2 = BigInt(1);
     let y3 = a;
@@ -98,22 +98,22 @@ function findMultiplicativeInverse(a = BigInt(0)) {
     return y2;
 }
 
-function applyDoubleAndAddMethod(P = new Point(), k = BigInt(0), a = BigInt(0), b = BigInt(0), mod = globalMod) {
+function applyDoubleAndAddMethod(P = new Point(), k = BigInt(0), a = BigInt(0), b = BigInt(0), modulo = globalModulo) {
     const kAsBinary = k.toString(2);
     // console.log(`(${k.getValue()})10 = (${kAsBinary})2`);
     let outputPoint = new Point(P.getPointX(), P.getPointY());
     for (let i = 1; i < kAsBinary.length; i++) {
         const currentBit = Number(kAsBinary[i]);
         // console.log(currentBit);
-        outputPoint = applyPointAddition(outputPoint, outputPoint, a, b, mod);
+        outputPoint = applyPointAddition(outputPoint, outputPoint, a, b, modulo);
         if (currentBit === 1) {
-            outputPoint = applyPointAddition(outputPoint, P, a, b, mod);
+            outputPoint = applyPointAddition(outputPoint, P, a, b, modulo);
         }
     }
     return outputPoint;
 }
 
-function applyPointAddition(P = new Point(), Q = new Point(), a = BigInt(0), b = BigInt(0), mod = globalMod) {
+function applyPointAddition(P = new Point(), Q = new Point(), a = BigInt(0), b = BigInt(0), modulo = globalModulo) {
     const x1 = P.getPointX();
     const y1 = P.getPointY();
     const x2 = Q.getPointX();
@@ -134,17 +134,17 @@ function applyPointAddition(P = new Point(), Q = new Point(), a = BigInt(0), b =
     };
 
     while (x3 < 0n) {
-        const times = (abs(x3) / mod) + 1n;
-        x3 = x3 + (times * mod);
+        const times = (abs(x3) / modulo) + 1n;
+        x3 = x3 + (times * modulo);
     }
 
     while (y3 < 0n) {
-        const times = (abs(y3) / mod) + 1n;
-        y3 = y3 + (times * mod);
+        const times = (abs(y3) / modulo) + 1n;
+        y3 = y3 + (times * modulo);
     }
 
-    x3 = x3 % mod;
-    y3 = y3 % mod;
+    x3 = x3 % modulo;
+    y3 = y3 % modulo;
 
     const R = new Point(x3, y3);
     return R;
