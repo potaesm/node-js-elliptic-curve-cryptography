@@ -20,11 +20,15 @@ function main() {
     // console.log('Double and add\n', doubleAndAddPoint.getPoint());
 
     /** Private key of Alice */
-    const ka = new BigDecimal('10000021');
+    const ka = new BigDecimal('100000000021');
     /** Private key of Bob */
-    const kb = new BigDecimal('10000077');
+    const kb = new BigDecimal('100000000077');
     /** Key exchange - Elliptic Curve Diffie Hellman */
+    let timeStart, timeStop;
+    timeStart = new Date();
     const alicePublicKey = applyDoubleAndAddMethod(P, ka, a, b);
+    timeStop = new Date();
+    console.log(`Public key generation time: `, timeStop.valueOf() - timeStart.valueOf(), 'ms');
     const bobPublicKey = applyDoubleAndAddMethod(P, kb, a, b);
     console.log({
         alicePrivateKey: ka.getValue(),
@@ -32,7 +36,10 @@ function main() {
         bobPrivateKey: kb.getValue(),
         bobPublicKey: bobPublicKey.getPoint()
     });
+    timeStart = new Date();
     const aliceSharedKey = applyDoubleAndAddMethod(bobPublicKey, ka, a, b);
+    timeStop = new Date();
+    console.log(`Shared key generation time: `, timeStop.valueOf() - timeStart.valueOf(), 'ms');
     const bobSharedKey = applyDoubleAndAddMethod(alicePublicKey, kb, a, b);
     console.log({
         aliceSharedKey: aliceSharedKey.getPoint(50),
