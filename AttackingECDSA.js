@@ -143,10 +143,10 @@ function applyPointAddition(P = new Point(), Q = new Point(), a = BigInt(0), b =
     let beta;
     if (x1 == x2 && y1 == y2) {
         /** Apply doubling */
-        beta = ((3n * x1 * x1) + a) * multiplicativeInverse(2n * y1);
+        beta = ((3n * x1 * x1) + a) * multiplicativeInverse(2n * y1, modulo);
     } else {
         /** Apply point addition */
-        beta = (y2 - y1) * multiplicativeInverse(x2 - x1);
+        beta = (y2 - y1) * multiplicativeInverse(x2 - x1, modulo);
     }
     let x3 = (beta * beta) - x1 - x2;
     let y3 = (beta * (x1 - x3)) - y1;

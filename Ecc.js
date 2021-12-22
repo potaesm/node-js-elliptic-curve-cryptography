@@ -12,22 +12,23 @@ const order = bitcoinConfig.order;
 
 function main() {
     /*********************************************************************************************** */
+    // /** Brute Force - Get New Point And Order Of Group (By Counting Points In Finite Field) */
     // console.log('P: ', P);
-    // /** Brute Force */
     // let newPoint = applyPointAddition(P, P, a, b);
     // console.log('2P: ', newPoint);
-    // for (let i = 3; i <= 100; i++) {
+    // for (let i = 3n; i <= 999n; i++) {
     //     try {
     //         newPoint = applyPointAddition(newPoint, P, a, b);
     //         console.log(`${i}P: `, newPoint);
     //     } catch (error) {
+    //         console.log('Order of group: ', i);
     //         break;
     //     }
     // }
     // console.log('Brute force\n', newPoint.getPoint());
 
-    // /** Double And Add */
-    // const doubleAndAddPoint = applyDoubleAndAddMethod(P, 100, a, b);
+    // /** Double And Add - Get New Point */
+    // const doubleAndAddPoint = applyDoubleAndAddMethod(P, 999n, a, b);
     // console.log('Double and add\n', doubleAndAddPoint.getPoint());
 
     /*********************************************************************************************** */
@@ -165,10 +166,10 @@ function applyPointAddition(P = new Point(), Q = new Point(), a = BigInt(0), b =
     let beta;
     if (x1 == x2 && y1 == y2) {
         /** Apply doubling */
-        beta = ((3n * x1 * x1) + a) * multiplicativeInverse(2n * y1);
+        beta = ((3n * x1 * x1) + a) * multiplicativeInverse(2n * y1, modulo);
     } else {
         /** Apply point addition */
-        beta = (y2 - y1) * multiplicativeInverse(x2 - x1);
+        beta = (y2 - y1) * multiplicativeInverse(x2 - x1, modulo);
     }
     let x3 = (beta * beta) - x1 - x2;
     let y3 = (beta * (x1 - x3)) - y1;

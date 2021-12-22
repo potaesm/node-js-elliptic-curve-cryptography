@@ -23,6 +23,7 @@
     "nodemon": "^2.0.15"
   },
   "dependencies": {
+    "bigint-isqrt": "^0.2.1",
     "bigint-mod-arith": "^3.0.1",
     "js-big-decimal": "^1.3.4",
     "random-bigint": "^0.0.1"
