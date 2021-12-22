@@ -13,8 +13,8 @@ const order = bitcoinConfig.order;
 function main() {
     /** Attacking Elliptic Curve Digital Signature Algorithm (ECDSA) */
     /** When the random key is constant (The random key is not randomized!) */
-
     /** 1. Get different signatures from different transactions */
+    console.log('-------------------- 1. Get different signatures from different transactions --------------------');
     /** Hashing */
     console.log('-------------------- Hashing --------------------');
     const text1 = 'Text 1';
@@ -32,6 +32,8 @@ function main() {
     const constantRandomKey = BigInt('28695618543805844332113829720373285210420739438570883203839696518176414791234');
     const randomKey1 = constantRandomKey;
     const randomKey2 = constantRandomKey;
+    // const randomKey1 = bitcoinConfig.randomKey();
+    // const randomKey2 = bitcoinConfig.randomKey();
     const randomPoint1 = applyDoubleAndAddMethod(P, randomKey1, a, b);
     const randomPoint2 = applyDoubleAndAddMethod(P, randomKey2, a, b);
     console.log({ randomKey1, randomPoint1: randomPoint1.getPoint() }, { randomKey2, randomPoint2: randomPoint2.getPoint() });
@@ -48,14 +50,27 @@ function main() {
     console.log('r1 == r2 ? ', r1 == r2);
 
     /** 2. Use those signatures to get a constant random key back */
+    console.log('-------------------- 2. Use those signatures to get a constant random key back --------------------');
     /**
-     * s1 - s2 = (randomKey^-1) * (hash1 - hash2) mod order
+     * s1 - s2 = (hash1 - hash2) * (randomKey^-1) mod order
      * randomKey^-1 = (s1 - s2) * [(hash1 - hash2)^-1] mod order
      * */
     const regeneratedRandomKeyInv = (s1 - s2) * multiplicativeInverse(hash1 - hash2, order) % order;
     const regeneratedRandomKey = multiplicativeInverse(regeneratedRandomKeyInv, order) % order;
-    console.log({ regeneratedRandomKey });
-
+    console.log({ randomKey1, randomKey2, regeneratedRandomKey });
+    console.log('randomKey1 == regeneratedRandomKey ? ', randomKey1 == regeneratedRandomKey);
+    console.log('randomKey2 == regeneratedRandomKey ? ', randomKey2 == regeneratedRandomKey);
+    /** 3. Get private key from random key */
+    console.log('-------------------- 3. Get private key from random key --------------------');
+    /**
+     * s = [hash + (privateKey * r)] * (randomKey^-1) mod order
+     * privateKey = [(s * randomKey) - hash] * (r^-1) mod order
+     */
+    const privateKey1 = ((s1 * regeneratedRandomKey) - hash1) * multiplicativeInverse(r1, order) % order;
+    const privateKey2 = ((s2 * regeneratedRandomKey) - hash2) * multiplicativeInverse(r2, order) % order;
+    console.log({ privateKey1, privateKey2, privateKey });
+    console.log('privateKey1 == privateKey', privateKey1 == privateKey);
+    console.log('privateKey2 == privateKey', privateKey2 == privateKey);
 }
 
 main();

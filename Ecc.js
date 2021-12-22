@@ -69,7 +69,7 @@ function main() {
     const publicKey = applyDoubleAndAddMethod(P, privateKey, a, b);
     console.log({ privateKey, publicKey: publicKey.getPoint() });
     /** Random Key And Random Point */
-    const randomKey = bitcoinConfig.randomKey;
+    const randomKey = bitcoinConfig.randomKey();
     const randomPoint = applyDoubleAndAddMethod(P, randomKey, a, b);
     console.log({ randomKey, randomPoint: randomPoint.getPoint() });
     /** Signature */
