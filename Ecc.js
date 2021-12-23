@@ -60,34 +60,69 @@ function main() {
     // });
 
     /*********************************************************************************************** */
-    /** Elliptic Curve Digital Signature Algorithm (ECDSA) */
-    /** Hashing */
-    const text = 'Created by Suthinan Musitmani';
-    const hash = cryptoHash(text);
-    console.log(text, hash);
-    /** Private Key And Public Key */
-    const privateKey = bitcoinConfig.privateKey;
-    const publicKey = applyDoubleAndAddMethod(P, privateKey, a, b);
-    console.log({ privateKey, publicKey: publicKey.getPoint() });
-    /** Random Key And Random Point */
+    // /** Elliptic Curve Digital Signature Algorithm (ECDSA) */
+    // /** Hashing */
+    // const text = 'Created by Suthinan Musitmani';
+    // const hash = cryptoHash(text);
+    // console.log(text, hash);
+    // /** Private Key And Public Key */
+    // const privateKey = bitcoinConfig.privateKey;
+    // const publicKey = applyDoubleAndAddMethod(P, privateKey, a, b);
+    // console.log({ privateKey, publicKey: publicKey.getPoint() });
+    // /** Random Key And Random Point */
+    // const randomKey = bitcoinConfig.randomKey();
+    // const randomPoint = applyDoubleAndAddMethod(P, randomKey, a, b);
+    // console.log({ randomKey, randomPoint: randomPoint.getPoint() });
+    // /** Signature */
+    // const r = randomPoint.getPointX() % order;
+    // const s = ((hash + (r * privateKey)) * multiplicativeInverse(randomKey, order)) % order;
+    // console.log({ r, s });
+    // /** Verification */
+    // const w = multiplicativeInverse(s, order);
+    // const u1 = applyDoubleAndAddMethod(P, ((hash * w) % order), a, b);
+    // const u2 = applyDoubleAndAddMethod(publicKey, ((r * w) % order), a, b);
+    // const checkPoint = applyPointAddition(u1, u2, a, b);
+    // console.log({ checkPoint: checkPoint.getPoint() });
+    // if (checkPoint.getPointX() == r) {
+    //     console.info('Signature is valid', checkPoint.getPointX(), r);
+    // } else {
+    //     console.warn('Signature is invalid', checkPoint.getPointX(), r);
+    // }
+
+    /*********************************************************************************************** */
+    /** Elliptic Curve ElGamal Cryptosystem */
+    /** Choose Sample Point At 1000P As A Plaintext */
+    console.log('-------------------- Plaintext --------------------');
+    const plaintext = new Point();
+    plaintext.setPointX(BigInt('33614996735103061868086131503312627786077049888376966084542785773152043381677'));
+    plaintext.setPointY(BigInt('84557594361191031609962062080128931200952163654712344162477769532776951195137'));
+    console.log({ plaintext });
+    /** Set Secret Key, Which Both Alice And Bob Must Know This Key (Using Bitcoin Private Key As An Example) */
+    console.log('-------------------- Secret Key And Public Key --------------------');
+    const secretKey = bitcoinConfig.privateKey;
+    console.log({ secretKey });
+    /** Get Public Key */
+    const publicKey = applyDoubleAndAddMethod(P, secretKey, a, b);
+    console.log({ publicKey });
+    /** Encryption */
+    console.log('-------------------- Encryption --------------------');
     const randomKey = bitcoinConfig.randomKey();
-    const randomPoint = applyDoubleAndAddMethod(P, randomKey, a, b);
-    console.log({ randomKey, randomPoint: randomPoint.getPoint() });
-    /** Signature */
-    const r = randomPoint.getPointX() % order;
-    const s = ((hash + (r * privateKey)) * multiplicativeInverse(randomKey, order)) % order;
-    console.log({ r, s });
-    /** Verification */
-    const w = multiplicativeInverse(s, order);
-    const u1 = applyDoubleAndAddMethod(P, ((hash * w) % order), a, b, globalModulo);
-    const u2 = applyDoubleAndAddMethod(publicKey, ((r * w) % order), a, b, globalModulo);
-    const checkPoint = applyPointAddition(u1, u2, a, b, globalModulo);
-    console.log({ checkPoint: checkPoint.getPoint() });
-    if (checkPoint.getPointX() == r) {
-        console.info('Signature is valid', checkPoint.getPointX(), r);
-    } else {
-        console.warn('Signature is invalid', checkPoint.getPointX(), r);
-    }
+    const ciphertext1 = applyDoubleAndAddMethod(P, randomKey, a, b);
+    let ciphertext2 = applyDoubleAndAddMethod(publicKey, randomKey, a, b);
+    ciphertext2 = applyPointAddition(ciphertext2, plaintext, a, b);
+    console.log({ ciphertext1, ciphertext2 });
+    /** Decryption */
+    console.log('-------------------- Encryption --------------------');
+    /** Let secretKeyCiphertext1 = (secretKey * ciphertext1) Point */
+    const secretKeyCiphertext1 = applyDoubleAndAddMethod(ciphertext1, secretKey, a, b);
+    /** Find The Inverse Of secretKeyCiphertext1 [secretKeyCiphertext1Inv = (secretKeyCiphertext1.x, -1 * secretKeyCiphertext1.y)] */
+    const secretKeyCiphertext1Inv = new Point(secretKeyCiphertext1.getPointX(), BigInt(-1) * secretKeyCiphertext1.getPointY());
+    /** Get Decrypted Plaintext [plaintext = ciphertext2 + (-secretKey * ciphertext1)] */
+    const decrypedPlaintext = applyPointAddition(ciphertext2, secretKeyCiphertext1Inv, a, b);
+    console.log({ decrypedPlaintext });
+    /** Summary */
+    console.log('-------------------- Summary --------------------');
+    console.log('plaintext == decrypedPlaintext ? ', plaintext.getPoint() == decrypedPlaintext.getPoint());
 }
 
 main();
