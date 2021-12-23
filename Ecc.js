@@ -90,7 +90,7 @@ function main() {
     // }
 
     /*********************************************************************************************** */
-    /** Elliptic Curve ElGamal Cryptosystem */
+    /** Elliptic Curve ElGamal Cryptosystem (Elliptic Curve For Symmetric Encryption And Decryption) */
     /** Choose Sample Point At 1000P As A Plaintext */
     console.log('-------------------- Plaintext --------------------');
     const plaintext = new Point();
